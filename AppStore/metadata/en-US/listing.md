@@ -11,7 +11,7 @@ Hit your 22-hour goal every day. Track aligner wear time, get change-day
 reminders, and keep a photo diary of your smile transformation.
 
 ## Keywords (max 100 chars, comma-separated, no spaces)
-aligner,invisalign,clear braces,orthodontic,wear time,teeth,retainer,tray,smile,dental,timer
+aligner,clear aligner,orthodontic,wear time,teeth,retainer,tray,smile,dental,timer,braces
 
 ## Description
 Aligner Tracker helps clear-aligner and retainer wearers stay on track and

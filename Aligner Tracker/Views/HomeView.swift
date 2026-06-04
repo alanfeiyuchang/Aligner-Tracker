@@ -58,9 +58,11 @@ struct HomeView: View {
             }
             .padding(.top, 8)
 
-            if timer.isRunning {
-                Label(WearFormatter.clock(timer.currentSessionSeconds), systemImage: "timer")
-                    .font(.title3.monospacedDigit())
+            if timer.isOff {
+                offTimer
+            } else if timer.isRunning {
+                Label("Aligner in — wearing now", systemImage: "checkmark.circle.fill")
+                    .font(.title3)
                     .foregroundStyle(Theme.tealDark)
             } else {
                 Label("Paused — aligner out", systemImage: "pause.circle")
@@ -80,6 +82,26 @@ struct HomeView: View {
         }
         .padding()
         .background(RoundedRectangle(cornerRadius: 24).fill(Color(.secondarySystemGroupedBackground)))
+    }
+
+    // Live "aligner is out" timer shown while paused.
+    private var offTimer: some View {
+        VStack(spacing: 6) {
+            Label("Aligner out", systemImage: "mouth")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Theme.goalRed)
+            Text(WearFormatter.clock(timer.currentOffSeconds))
+                .font(.system(size: 34, weight: .bold, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(Theme.goalRed)
+                .contentTransition(.numericText())
+            Text("Put it back in to log this break")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity)
+        .background(RoundedRectangle(cornerRadius: 16).fill(Theme.goalRed.opacity(0.12)))
     }
 
     // MARK: Tray card

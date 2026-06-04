@@ -39,4 +39,15 @@ enum WearFormatter {
         let s = total % 60
         return String(format: "%02d:%02d:%02d", h, m, s)
     }
+
+    /// Compact duration that keeps seconds for short spans: "1h 5m", "12m", "45s".
+    static func short(_ seconds: Double) -> String {
+        let total = Int(max(0, seconds))
+        let h = total / 3600
+        let m = (total % 3600) / 60
+        let s = total % 60
+        if h > 0 { return "\(h)h \(m)m" }
+        if m > 0 { return "\(m)m" }
+        return "\(s)s"
+    }
 }

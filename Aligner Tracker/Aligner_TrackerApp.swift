@@ -14,7 +14,7 @@ struct Aligner_TrackerApp: App {
     @State private var timer = TimerViewModel()
 
     let container: ModelContainer = {
-        let schema = Schema([DailyLog.self, WearSession.self, AlignerDiaryEntry.self])
+        let schema = Schema([DailyLog.self, WearSession.self, OffSession.self, AlignerDiaryEntry.self])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         do {
             return try ModelContainer(for: schema, configurations: config)

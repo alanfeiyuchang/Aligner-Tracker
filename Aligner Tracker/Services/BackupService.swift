@@ -28,16 +28,23 @@ enum BackupService {
             var note: String
             var hasPhoto: Bool
         }
+        struct OffPeriod: Codable {
+            var start: Date
+            var end: Date
+            var durationSeconds: Double
+        }
         var exportedAt: Date
         var settings: Settings
         var dailyLogs: [Day]
         var diary: [Diary]
+        var offPeriods: [OffPeriod]
     }
 
     /// Build the backup payload and write it to a temporary file for sharing.
     static func exportJSON(context: ModelContext, settings: AppSettings) throws -> URL {
         let logs = (try? context.fetch(FetchDescriptor<DailyLog>(sortBy: [SortDescriptor(\.day)]))) ?? []
         let entries = (try? context.fetch(FetchDescriptor<AlignerDiaryEntry>(sortBy: [SortDescriptor(\.date)]))) ?? []
+        let offs = (try? context.fetch(FetchDescriptor<OffSession>(sortBy: [SortDescriptor(\.startDate)]))) ?? []
 
         let backup = Backup(
             exportedAt: .now,
@@ -53,6 +60,9 @@ enum BackupService {
                 .init(date: $0.date, trayNumber: $0.trayNumber,
                       totalTreatmentDays: $0.totalTreatmentDays,
                       note: $0.note, hasPhoto: $0.photoData != nil)
+            },
+            offPeriods: offs.map {
+                .init(start: $0.startDate, end: $0.endDate, durationSeconds: $0.duration)
             }
         )
 

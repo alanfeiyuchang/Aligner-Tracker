@@ -13,9 +13,10 @@ struct HistoryView: View {
     @Environment(AppSettings.self) private var settings
     @Environment(TimerViewModel.self) private var timer
     @Query(sort: \DailyLog.day, order: .reverse) private var logs: [DailyLog]
+    @Query(sort: \OffSession.startDate, order: .reverse) private var offSessions: [OffSession]
 
     @State private var visibleMonth: Date = Calendar.current.startOfDay(for: .now)
-    @State private var selectedDay: Date?
+    @State private var selectedDay: Date? = Calendar.current.startOfDay(for: .now)
 
     private var goal: Double { settings.dailyGoalSeconds }
     private let cal = Calendar.current
@@ -163,7 +164,9 @@ struct HistoryView: View {
 
     private func selectedDayCard(_ day: Date) -> some View {
         let total = totalsByDay[day] ?? 0
-        return VStack(alignment: .leading, spacing: 8) {
+        let offs = offSessions(on: day)
+        let offTotal = offs.reduce(0.0) { $0 + $1.duration }
+        return VStack(alignment: .leading, spacing: 12) {
             Text(day.formatted(date: .complete, time: .omitted)).font(.headline)
             HStack {
                 Circle().fill(cellColor(for: total)).frame(width: 12, height: 12)
@@ -171,10 +174,47 @@ struct HistoryView: View {
                 Text("/ \(WearFormatter.hm(goal))").foregroundStyle(.secondary)
             }
             .font(.subheadline)
+
+            if !offs.isEmpty {
+                Divider()
+                HStack {
+                    Label("Aligner out", systemImage: "mouth")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Theme.goalRed)
+                    Spacer()
+                    Text("\(offs.count) ×  ·  \(WearFormatter.short(offTotal)) total")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                ForEach(offs) { session in
+                    offRow(session)
+                }
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
         .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemGroupedBackground)))
+    }
+
+    private func offRow(_ session: OffSession) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: "arrow.right.circle")
+                .foregroundStyle(Theme.goalRed.opacity(0.7))
+                .font(.caption)
+            Text("\(session.startDate.formatted(date: .omitted, time: .shortened)) – \(session.endDate.formatted(date: .omitted, time: .shortened))")
+                .font(.subheadline.monospacedDigit())
+            Spacer()
+            Text(WearFormatter.short(session.duration))
+                .font(.subheadline.weight(.semibold).monospacedDigit())
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 2)
+    }
+
+    /// Off-periods whose start falls on the given day, newest first.
+    private func offSessions(on day: Date) -> [OffSession] {
+        let start = cal.startOfDay(for: day)
+        return offSessions.filter { cal.isDate($0.startDate, inSameDayAs: start) }
     }
 
     // MARK: Helpers

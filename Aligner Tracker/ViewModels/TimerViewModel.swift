@@ -20,10 +20,16 @@ final class TimerViewModel {
     private(set) var isRunning = false
     private(set) var todayTotalSeconds: Double = 0
     private(set) var currentSessionSeconds: Double = 0
+    /// True while the aligner is out (paused after having been worn).
+    private(set) var isOff = false
+    /// Live elapsed time of the current off-period, in seconds.
+    private(set) var currentOffSeconds: Double = 0
 
     @ObservationIgnored private var context: ModelContext?
     @ObservationIgnored private var settings: AppSettings?
     @ObservationIgnored private var sessionStart: Date?
+    /// When the aligner was taken out; nil unless currently off.
+    @ObservationIgnored private var offStart: Date?
     @ObservationIgnored private var committedTodaySeconds: Double = 0
     @ObservationIgnored private var ticker: Timer?
 
@@ -54,15 +60,22 @@ final class TimerViewModel {
                 sessionStart = start
             }
             isRunning = true
+            offStart = nil
         } else {
             isRunning = false
             sessionStart = nil
+            // Restore an in-progress off-period (survives backgrounding/kill).
+            if d.object(forKey: SharedStore.Key.offStartTimestamp) != nil {
+                offStart = Date(timeIntervalSince1970: d.double(forKey: SharedStore.Key.offStartTimestamp))
+            } else {
+                offStart = nil
+            }
         }
 
         committedTodaySeconds = loadTodayCommitted()
         recompute()
         pushSnapshot()
-        if isRunning { startTicker() }
+        if isRunning || isOff { startTicker() }
     }
 
     // MARK: - Public actions
@@ -71,6 +84,8 @@ final class TimerViewModel {
 
     func start() {
         guard !isRunning else { return }
+        // Putting the aligner back in closes the current off-period.
+        finalizeOffSession(endingAt: .now)
         sessionStart = .now
         isRunning = true
         committedTodaySeconds = loadTodayCommitted()
@@ -85,10 +100,13 @@ final class TimerViewModel {
         commit(from: start, to: .now)
         isRunning = false
         sessionStart = nil
-        stopTicker()
+        // Begin tracking how long the aligner is out.
+        offStart = .now
+        SharedStore.defaults.set(offStart!.timeIntervalSince1970, forKey: SharedStore.Key.offStartTimestamp)
         committedTodaySeconds = loadTodayCommitted()
         recompute()
         pushSnapshot()
+        startTicker() // keep ticking to drive the live off-timer
         reloadWidget()
     }
 
@@ -117,15 +135,16 @@ final class TimerViewModel {
     }
 
     private func tick() {
-        guard isRunning, let start = sessionStart else { return }
-        // Handle a midnight crossing while running in the foreground.
-        let startOfToday = cal.startOfDay(for: .now)
-        if start < startOfToday {
-            commit(from: start, to: startOfToday)
-            sessionStart = startOfToday
-            committedTodaySeconds = loadTodayCommitted()
-            pushSnapshot()
-            reloadWidget()
+        if isRunning, let start = sessionStart {
+            // Handle a midnight crossing while running in the foreground.
+            let startOfToday = cal.startOfDay(for: .now)
+            if start < startOfToday {
+                commit(from: start, to: startOfToday)
+                sessionStart = startOfToday
+                committedTodaySeconds = loadTodayCommitted()
+                pushSnapshot()
+                reloadWidget()
+            }
         }
         recompute()
     }
@@ -136,7 +155,26 @@ final class TimerViewModel {
         } else {
             currentSessionSeconds = 0
         }
+        if !isRunning, let off = offStart {
+            isOff = true
+            currentOffSeconds = max(0, Date.now.timeIntervalSince(off))
+        } else {
+            isOff = false
+            currentOffSeconds = 0
+        }
         todayTotalSeconds = committedTodaySeconds + currentSessionSeconds
+    }
+
+    /// Records the finished off-period as an `OffSession` and clears the
+    /// in-progress off-state from both memory and the shared store.
+    private func finalizeOffSession(endingAt end: Date) {
+        defer {
+            offStart = nil
+            SharedStore.defaults.removeObject(forKey: SharedStore.Key.offStartTimestamp)
+        }
+        guard let context, let off = offStart, end > off else { return }
+        context.insert(OffSession(startDate: off, endDate: end))
+        try? context.save()
     }
 
     // MARK: - Persistence helpers

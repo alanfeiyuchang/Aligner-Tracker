@@ -17,6 +17,8 @@ enum SharedStore {
         static let dailyGoalSeconds = "dailyGoalSeconds"
         static let isTimerRunning = "isTimerRunning"
         static let timerStartTimestamp = "timerStartTimestamp"
+        /// When the aligner was taken out (start of the current off-period).
+        static let offStartTimestamp = "offStartTimestamp"
         static let currentTrayNumber = "currentTrayNumber"
         static let totalTrays = "totalTrays"
         static let daysUntilChange = "daysUntilChange"

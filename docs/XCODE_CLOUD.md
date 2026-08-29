@@ -28,6 +28,11 @@ access to the GitHub repository. In **Xcode**:
 2. Pick **Aligner Tracker** as the product. Xcode lists the shared scheme; if
    it does not appear, the scheme lost its "Shared" tick in
    *Product → Scheme → Manage Schemes*.
+
+   Two Apple IDs are signed in on this machine, on two different teams. Pick
+   **5V3HM8L9GT** (Feiyu Chang) — that is the team the project's
+   `DEVELOPMENT_TEAM` points at and the one holding the app record. The other
+   (`8C3X7ZT98L`) would attach the workflow to the wrong account.
 3. Grant App Store Connect access when prompted, then let Xcode connect to
    `alanfeiyuchang/Aligner-Tracker`. GitHub will ask you to install the Xcode
    Cloud app on the repository — this is the step that cannot be automated.
@@ -35,7 +40,10 @@ access to the GitHub repository. In **Xcode**:
 
    - **Start Conditions** — *Branch Changes* on `main`. Leave pull request
      builds on if you want checks on PRs.
-   - **Environment** — the latest release Xcode. macOS version: default.
+   - **Environment** — the latest **release** Xcode, not a beta. `xcode-select`
+     on this machine currently points at Xcode-beta, which is fine for creating
+     the workflow, but a build produced by a beta Xcode cannot be submitted to
+     the App Store, so a release version keeps the door open.
    - **Actions** — add two:
 
      | Action | Settings |

@@ -126,13 +126,15 @@ struct HistoryView: View {
     }
 
     private func dayCell(_ date: Date, total: Double?) -> some View {
+        let day = cal.startOfDay(for: date)
         let isToday = cal.isDateInToday(date)
+        let isSelected = selectedDay == day
         let color = total.map { cellColor(for: $0) } ?? Color(.tertiarySystemFill)
         return Button {
-            selectedDay = cal.startOfDay(for: date)
+            selectedDay = day
         } label: {
             Text("\(cal.component(.day, from: date))")
-                .font(.callout)
+                .font(isSelected ? .callout.bold() : .callout)
                 .frame(maxWidth: .infinity, minHeight: 38)
                 .background(Circle().fill(color).frame(width: 34, height: 34))
                 .overlay {
@@ -140,9 +142,19 @@ struct HistoryView: View {
                         Circle().stroke(Theme.tealDark, lineWidth: 2).frame(width: 34, height: 34)
                     }
                 }
+                // Selection sits outside the status fill and the "today" ring so
+                // one day can carry all three at once. 40pt keeps a gap between
+                // neighbouring cells down to the narrowest supported screen.
+                .overlay {
+                    if isSelected {
+                        Circle().stroke(Theme.selection, lineWidth: 2.5).frame(width: 40, height: 40)
+                    }
+                }
                 .foregroundStyle(total == nil ? Color.secondary : .white)
+                .animation(.easeOut(duration: 0.15), value: isSelected)
         }
         .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 
     private var legend: some View {

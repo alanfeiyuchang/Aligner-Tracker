@@ -16,6 +16,11 @@ enum Theme {
     static let goalYellow = Color(red: 0xF2 / 255, green: 0xC0 / 255, blue: 0x37 / 255)
     static let goalRed = Color(red: 0xE5 / 255, green: 0x57 / 255, blue: 0x53 / 255)
 
+    /// Selection ring in the history calendar — #5AB0F2. Kept blue rather than
+    /// teal so it reads apart from the "today" ring, and mid-luminance so it
+    /// holds up on both the light and dark card backgrounds.
+    static let selection = Color(red: 0x5A / 255, green: 0xB0 / 255, blue: 0xF2 / 255)
+
     static let ringGradient = AngularGradient(
         colors: [teal, tealDark, teal],
         center: .center

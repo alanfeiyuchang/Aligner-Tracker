@@ -10,7 +10,7 @@ ID, which is why it is written out below rather than scripted.
 | Requirement | State |
 |---|---|
 | A **shared** scheme that archives | `Aligner Tracker.xcscheme` in `xcshareddata/xcschemes`, Archive action on Release |
-| The scheme actually archives | Verified: `ARCHIVE SUCCEEDED`, app and widget both `1.0.1 (1)` |
+| The scheme actually archives | Verified: `ARCHIVE SUCCEEDED`, app and widget both `1.1 (1)` |
 | App and extension versions agree | `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` are defined once on the project; every target inherits them |
 | A test target CI can run | `AlignerTrackerTests`, wired into the shared scheme's Test action |
 | Build numbers that do not collide | `ci_scripts/ci_pre_xcodebuild.sh` stamps `CI_BUILD_NUMBER` into `CURRENT_PROJECT_VERSION` |

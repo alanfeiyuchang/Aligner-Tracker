@@ -3,6 +3,8 @@
 //  Aligner Tracker
 //
 //  Full-screen detail for a single diary entry with all metadata and sharing.
+//  The date and time stay editable here, so an entry logged in a hurry — or
+//  logged on the wrong day — can be corrected without deleting and redoing it.
 //
 
 import SwiftUI
@@ -35,7 +37,11 @@ struct DiaryEntryView: View {
 
                 VStack(alignment: .leading, spacing: 10) {
                     metaRow("mouth", "Tray", "\(entry.trayNumber)")
-                    metaRow("calendar", "Date", entry.date.formatted(date: .complete, time: .shortened))
+                    DatePicker(selection: dateBinding) {
+                        Label("Date & time", systemImage: "calendar")
+                            .foregroundStyle(Theme.tealDark)
+                    }
+                    .datePickerStyle(.compact)
                     metaRow("clock", "Treatment day", "\(entry.totalTreatmentDays)")
                 }
                 .padding()
@@ -84,6 +90,16 @@ struct DiaryEntryView: View {
                 dismiss()
             }
         }
+    }
+
+    /// Writes straight through to the stored entry; the diary is sorted by date,
+    /// so the gallery reorders itself as soon as this changes.
+    private var dateBinding: Binding<Date> {
+        Binding(get: { entry.date },
+                set: { newValue in
+                    entry.date = newValue
+                    try? context.save()
+                })
     }
 
     private func metaRow(_ icon: String, _ label: LocalizedStringKey, _ value: String) -> some View {

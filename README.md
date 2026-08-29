@@ -52,6 +52,7 @@ Aligner Tracker/            App target
 AlignerTrackerWidget/       Widget extension (small / medium / lock-screen)
 Shared/                     Code compiled into both targets (WearMath)
 AlignerTrackerTests/        Unit tests (Swift Testing)
+ci_scripts/                 Xcode Cloud hooks
 AppStore/                   Publishing assets (see below)
 ```
 
@@ -69,6 +70,19 @@ Or from the command line:
 xcodebuild -project "Aligner Tracker.xcodeproj" -scheme "Aligner Tracker" \
   -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max' build
 ```
+
+### Tests
+
+```bash
+xcodebuild test -project "Aligner Tracker.xcodeproj" -scheme "Aligner Tracker" \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
+```
+
+### Continuous integration
+
+Built and archived by Xcode Cloud. The workflow lives in App Store Connect,
+not in this repo; `docs/XCODE_CLOUD.md` covers what the repo provides and how
+the workflow is set up.
 
 ### App Group
 

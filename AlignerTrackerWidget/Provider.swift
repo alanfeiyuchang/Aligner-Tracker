@@ -26,21 +26,32 @@ struct Provider: TimelineProvider {
         let data = WidgetDataStore.load()
         let now = Date.now
         let cal = Calendar.current
+        let midnight = WearMath.nextMidnight(after: now, calendar: cal)
 
+        var entries: [AlignerEntry] = []
         if data.isTimerRunning {
             // Advance the displayed wear time across the next few hours so the
             // ring keeps moving; WidgetKit refreshes at most every 15 minutes.
-            var entries: [AlignerEntry] = []
             for step in stride(from: 0, through: 16, by: 1) {
-                let date = cal.date(byAdding: .minute, value: step * 15, to: now) ?? now
+                guard let date = cal.date(byAdding: .minute, value: step * 15, to: now),
+                      date < midnight else { break }
                 entries.append(AlignerEntry(date: date, data: data))
             }
-            completion(Timeline(entries: entries, policy: .atEnd))
-        } else {
-            // Paused: nothing changes until the daily reset at midnight.
-            let nextMidnight = cal.startOfDay(for: cal.date(byAdding: .day, value: 1, to: now) ?? now)
-            let entry = AlignerEntry(date: now, data: data)
-            completion(Timeline(entries: [entry], policy: .after(nextMidnight)))
         }
+        if entries.isEmpty { entries.append(AlignerEntry(date: now, data: data)) }
+
+        // Land an entry exactly on midnight when it falls inside the window, so
+        // the day resets on the boundary even if the app is never opened and no
+        // fresh snapshot is pushed. `wearSeconds(at:)` is day-bounded, so that
+        // entry renders the new day on its own.
+        if midnight <= now.addingTimeInterval(4 * 3600) {
+            entries.append(AlignerEntry(date: midnight, data: data))
+        }
+
+        // Paused, nothing moves until the day flips; running, reload at the end
+        // of the window or at midnight, whichever comes first.
+        let windowEnd = entries.last?.date ?? now
+        let reload = data.isTimerRunning ? min(midnight, windowEnd) : midnight
+        completion(Timeline(entries: entries, policy: .after(reload)))
     }
 }

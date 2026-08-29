@@ -50,6 +50,8 @@ Aligner Tracker/            App target
 ├── Localizable.xcstrings   en + zh-Hans
 └── PrivacyInfo.xcprivacy
 AlignerTrackerWidget/       Widget extension (small / medium / lock-screen)
+Shared/                     Code compiled into both targets (WearMath)
+AlignerTrackerTests/        Unit tests (Swift Testing)
 AppStore/                   Publishing assets (see below)
 ```
 

@@ -9,6 +9,10 @@ import Foundation
 
 struct WidgetData {
     var todayWearSeconds: Int
+    /// Midnight of the day `todayWearSeconds` was recorded for. Without it a
+    /// running session that crosses midnight keeps adding to the previous
+    /// day's total, which is how the widget used to show more than 24h.
+    var committedDay: Date?
     var dailyGoalSeconds: Int
     var isTimerRunning: Bool
     var timerStartTimestamp: Date?
@@ -17,10 +21,14 @@ struct WidgetData {
     var daysUntilChange: Int
     var hasData: Bool
 
-    /// Wear seconds projected to `date` (adds the live running session).
+    /// Wear seconds for the calendar day containing `date`, projected to `date`.
     func wearSeconds(at date: Date) -> Int {
-        guard isTimerRunning, let start = timerStartTimestamp else { return todayWearSeconds }
-        return todayWearSeconds + max(0, Int(date.timeIntervalSince(start)))
+        Int(WearMath.wearSeconds(committedSeconds: Double(todayWearSeconds),
+                                 committedDay: committedDay,
+                                 isRunning: isTimerRunning,
+                                 sessionStart: timerStartTimestamp,
+                                 at: date,
+                                 calendar: .current))
     }
 
     func progress(at date: Date) -> Double {
@@ -30,6 +38,7 @@ struct WidgetData {
 
     static let placeholder = WidgetData(
         todayWearSeconds: 18 * 3600 + 32 * 60,
+        committedDay: Calendar.current.startOfDay(for: .now),
         dailyGoalSeconds: 22 * 3600,
         isTimerRunning: false,
         timerStartTimestamp: nil,
@@ -40,7 +49,7 @@ struct WidgetData {
     )
 
     static let empty = WidgetData(
-        todayWearSeconds: 0, dailyGoalSeconds: 22 * 3600,
+        todayWearSeconds: 0, committedDay: nil, dailyGoalSeconds: 22 * 3600,
         isTimerRunning: false, timerStartTimestamp: nil,
         currentTrayNumber: 0, totalTrays: 0, daysUntilChange: 0, hasData: false
     )
@@ -54,6 +63,7 @@ enum WidgetDataStore {
         static let dailyGoalSeconds = "dailyGoalSeconds"
         static let isTimerRunning = "isTimerRunning"
         static let timerStartTimestamp = "timerStartTimestamp"
+        static let committedDayTimestamp = "committedDayTimestamp"
         static let currentTrayNumber = "currentTrayNumber"
         static let totalTrays = "totalTrays"
         static let daysUntilChange = "daysUntilChange"
@@ -67,9 +77,16 @@ enum WidgetDataStore {
         let start: Date? = d.object(forKey: Key.timerStartTimestamp) != nil
             ? Date(timeIntervalSince1970: d.double(forKey: Key.timerStartTimestamp))
             : nil
+        // Written since the day-bounded fix; absent on a store last written by
+        // an older build, in which case the committed total is dropped rather
+        // than credited to the wrong day. The next app launch restores it.
+        let committedDay: Date? = d.object(forKey: Key.committedDayTimestamp) != nil
+            ? Date(timeIntervalSince1970: d.double(forKey: Key.committedDayTimestamp))
+            : nil
         let goal = d.integer(forKey: Key.dailyGoalSeconds)
         return WidgetData(
             todayWearSeconds: d.integer(forKey: Key.todayWearSeconds),
+            committedDay: committedDay,
             dailyGoalSeconds: goal == 0 ? 22 * 3600 : goal,
             isTimerRunning: d.bool(forKey: Key.isTimerRunning),
             timerStartTimestamp: start,

@@ -17,6 +17,8 @@ enum SharedStore {
         static let dailyGoalSeconds = "dailyGoalSeconds"
         static let isTimerRunning = "isTimerRunning"
         static let timerStartTimestamp = "timerStartTimestamp"
+        /// Midnight of the day `todayWearSeconds` was recorded for.
+        static let committedDayTimestamp = "committedDayTimestamp"
         /// When the aligner was taken out (start of the current off-period).
         static let offStartTimestamp = "offStartTimestamp"
         static let currentTrayNumber = "currentTrayNumber"
@@ -34,6 +36,9 @@ enum SharedStore {
     /// A plain value snapshot the timer view model pushes into the shared store.
     struct Snapshot {
         var todayWearSeconds: Int
+        /// The day `todayWearSeconds` belongs to. The widget needs it to know
+        /// whether that total still applies to the day it is rendering.
+        var committedDay: Date
         var dailyGoalSeconds: Int
         var isTimerRunning: Bool
         var timerStartTimestamp: Date?
@@ -45,6 +50,7 @@ enum SharedStore {
     static func write(_ snapshot: Snapshot) {
         let d = defaults
         d.set(snapshot.todayWearSeconds, forKey: Key.todayWearSeconds)
+        d.set(snapshot.committedDay.timeIntervalSince1970, forKey: Key.committedDayTimestamp)
         d.set(snapshot.dailyGoalSeconds, forKey: Key.dailyGoalSeconds)
         d.set(snapshot.isTimerRunning, forKey: Key.isTimerRunning)
         if let ts = snapshot.timerStartTimestamp {

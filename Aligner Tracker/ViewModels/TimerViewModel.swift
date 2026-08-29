@@ -31,9 +31,14 @@ final class TimerViewModel {
     /// When the aligner was taken out; nil unless currently off.
     @ObservationIgnored private var offStart: Date?
     @ObservationIgnored private var committedTodaySeconds: Double = 0
+    /// The day `committedTodaySeconds` was loaded for. Without it the cached
+    /// total silently carries into the next day.
+    @ObservationIgnored private var committedDay: Date = Calendar.current.startOfDay(for: .now)
     @ObservationIgnored private var ticker: Timer?
 
-    private let cal = Calendar.current
+    /// Read fresh on every use: `Calendar.current` is a snapshot, so holding one
+    /// for the lifetime of the view model keeps a stale time zone after travel.
+    private var cal: Calendar { Calendar.current }
 
     // MARK: - Wiring
 
@@ -135,16 +140,28 @@ final class TimerViewModel {
     }
 
     private func tick() {
-        if isRunning, let start = sessionStart {
-            // Handle a midnight crossing while running in the foreground.
-            let startOfToday = cal.startOfDay(for: .now)
-            if start < startOfToday {
-                commit(from: start, to: startOfToday)
-                sessionStart = startOfToday
-                committedTodaySeconds = loadTodayCommitted()
-                pushSnapshot()
-                reloadWidget()
-            }
+        let startOfToday = cal.startOfDay(for: .now)
+        var dayRolled = false
+
+        // Handle a midnight crossing while running in the foreground: close the
+        // part that belongs to the day just ended and keep the rest live.
+        if isRunning, let start = sessionStart, start < startOfToday {
+            commit(from: start, to: startOfToday)
+            sessionStart = startOfToday
+            dayRolled = true
+        }
+
+        // The cached total is only valid for the day it was loaded for. This
+        // also covers sitting in the foreground while paused across midnight,
+        // where there is no session to roll forward.
+        if committedDay != startOfToday {
+            committedTodaySeconds = loadTodayCommitted()
+            dayRolled = true
+        }
+
+        if dayRolled {
+            pushSnapshot()
+            reloadWidget()
         }
         recompute()
     }
@@ -162,7 +179,12 @@ final class TimerViewModel {
             isOff = false
             currentOffSeconds = 0
         }
-        todayTotalSeconds = committedTodaySeconds + currentSessionSeconds
+        todayTotalSeconds = WearMath.wearSeconds(committedSeconds: committedTodaySeconds,
+                                                 committedDay: committedDay,
+                                                 isRunning: isRunning,
+                                                 sessionStart: sessionStart,
+                                                 at: .now,
+                                                 calendar: cal)
     }
 
     /// Records the finished off-period as an `OffSession` and clears the
@@ -180,8 +202,9 @@ final class TimerViewModel {
     // MARK: - Persistence helpers
 
     private func loadTodayCommitted() -> Double {
-        guard let context else { return 0 }
         let today = cal.startOfDay(for: .now)
+        committedDay = today
+        guard let context else { return 0 }
         let desc = FetchDescriptor<DailyLog>(predicate: #Predicate { $0.day == today })
         return (try? context.fetch(desc).first?.totalSeconds) ?? 0
     }
@@ -219,6 +242,7 @@ final class TimerViewModel {
         guard let settings else { return }
         let snapshot = SharedStore.Snapshot(
             todayWearSeconds: Int(committedTodaySeconds),
+            committedDay: committedDay,
             dailyGoalSeconds: Int(settings.dailyGoalSeconds),
             isTimerRunning: isRunning,
             timerStartTimestamp: isRunning ? sessionStart : nil,

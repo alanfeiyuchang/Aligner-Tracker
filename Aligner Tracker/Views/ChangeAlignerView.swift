@@ -2,8 +2,11 @@
 //  ChangeAlignerView.swift
 //  Aligner Tracker
 //
-//  Flow for logging a tray change: capture a photo, add a note, auto-stamp
-//  metadata, save a diary entry and advance to the next tray.
+//  Flow for logging a tray change: capture a photo, add a note, confirm when
+//  the change happened and which tray/treatment day it belongs to, then save a
+//  diary entry and advance to the next tray. The date, time, tray number and
+//  treatment day all default to the values for right now and can be adjusted,
+//  which is what makes logging a change after the fact possible.
 //
 
 import SwiftUI
@@ -22,6 +25,14 @@ struct ChangeAlignerView: View {
     @State private var pickerItem: PhotosPickerItem?
     @State private var showCamera = false
     @State private var advanceTray = true
+
+    @State private var changeDate = Date.now
+    @State private var trayNumber = 1
+    @State private var treatmentDay = 0
+    /// Once the treatment day is typed by hand it stops following the date.
+    @State private var treatmentDayEdited = false
+    @FocusState private var noteFocused: Bool
+    @FocusState private var treatmentDayFocused: Bool
 
     var body: some View {
         NavigationStack {
@@ -46,23 +57,43 @@ struct ChangeAlignerView: View {
                 Section("Note") {
                     TextField("e.g. Tray 8 — teeth feel tighter", text: $note, axis: .vertical)
                         .lineLimit(3...6)
+                        .focused($noteFocused)
                 }
 
                 Section("Details") {
-                    LabeledContent("Date", value: Date.now.formatted(date: .abbreviated, time: .shortened))
-                    LabeledContent("Tray", value: "\(settings.currentTrayNumber) of \(settings.totalTrays)")
-                    LabeledContent("Treatment day", value: "\(settings.totalTreatmentDays)")
+                    DatePicker("Date & time", selection: $changeDate)
+                    Stepper(value: $trayNumber, in: 1...max(1, settings.totalTrays)) {
+                        Text("Tray \(trayNumber) of \(settings.totalTrays)")
+                    }
+                    LabeledContent("Treatment day") {
+                        TextField("Treatment day", value: treatmentDayBinding, format: .number)
+                            .keyboardType(.numberPad)
+                            .multilineTextAlignment(.trailing)
+                            .focused($treatmentDayFocused)
+                    }
                     Toggle("Advance to next tray", isOn: $advanceTray)
                 }
             }
             .navigationTitle("Change Aligner")
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear(perform: loadDefaults)
+            .onChange(of: changeDate) { _, newValue in
+                guard !treatmentDayEdited else { return }
+                treatmentDay = settings.totalTreatmentDays(asOf: newValue)
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") { save() }
+                }
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") {
+                        noteFocused = false
+                        treatmentDayFocused = false
+                    }
                 }
             }
             .fullScreenCover(isPresented: $showCamera) {
@@ -105,10 +136,33 @@ struct ChangeAlignerView: View {
         }
     }
 
+    /// Writing straight to `treatmentDay` elsewhere keeps the "follow the date"
+    /// behaviour; only a change made through this binding counts as an edit.
+    private var treatmentDayBinding: Binding<Int> {
+        Binding(get: { treatmentDay },
+                set: { treatmentDay = max(0, $0); treatmentDayEdited = true })
+    }
+
+    /// Everything defaults to "as of right now", so the common case is one tap.
+    private func loadDefaults() {
+        changeDate = .now
+        trayNumber = max(1, settings.currentTrayNumber)
+        treatmentDay = settings.totalTreatmentDays(asOf: changeDate)
+        treatmentDayEdited = false
+    }
+
     private func save() {
-        diaryVM.createEntry(context: context, settings: settings, image: image, note: note)
+        diaryVM.createEntry(context: context,
+                            date: changeDate,
+                            trayNumber: trayNumber,
+                            totalTreatmentDays: treatmentDay,
+                            image: image,
+                            note: note)
         if advanceTray {
-            settings.advanceToNextTray()
+            settings.advanceToNextTray(from: trayNumber, startingAt: changeDate)
+        } else if trayNumber != settings.currentTrayNumber {
+            // The picker was used to correct which tray is being worn.
+            settings.currentTrayNumber = trayNumber
         }
         timer.settingsChanged()
         Task { await NotificationService.shared.reschedule(with: settings) }

@@ -14,16 +14,21 @@ import UIKit
 @Observable
 final class DiaryViewModel {
 
+    /// The tray number and treatment day are passed in rather than read from
+    /// settings: the change screen lets the user adjust both, along with when
+    /// the change happened.
     @discardableResult
     func createEntry(context: ModelContext,
-                     settings: AppSettings,
+                     date: Date = .now,
+                     trayNumber: Int,
+                     totalTreatmentDays: Int,
                      image: UIImage?,
                      note: String) -> AlignerDiaryEntry {
         let data = image?.jpegData(compressionQuality: 0.8)
         let entry = AlignerDiaryEntry(
-            date: .now,
-            trayNumber: settings.currentTrayNumber,
-            totalTreatmentDays: settings.totalTreatmentDays,
+            date: date,
+            trayNumber: trayNumber,
+            totalTreatmentDays: totalTreatmentDays,
             note: note,
             photoData: data
         )

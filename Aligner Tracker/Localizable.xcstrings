@@ -308,6 +308,22 @@
         }
       }
     },
+    "Date & time" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date & time"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日期与时间"
+          }
+        }
+      }
+    },
     "Day before change" : {
       "localizations" : {
         "zh-Hans" : {
@@ -364,6 +380,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "日记"
+          }
+        }
+      }
+    },
+    "Done" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成"
           }
         }
       }

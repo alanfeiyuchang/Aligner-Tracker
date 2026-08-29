@@ -149,12 +149,16 @@ final class AppSettings {
     }
 
     /// Total days into the overall treatment plan as of today.
-    var totalTreatmentDays: Int {
+    var totalTreatmentDays: Int { totalTreatmentDays(asOf: .now) }
+
+    /// Total days into the overall treatment plan as of `date`, so a tray change
+    /// logged for an earlier moment is stamped with the day it actually was.
+    func totalTreatmentDays(asOf date: Date) -> Int {
         let cal = Calendar.current
         let firstTrayStart = cal.date(byAdding: .day,
                                       value: -(currentTrayNumber - 1) * changeIntervalDays,
                                       to: cal.startOfDay(for: alignerStartDate)) ?? alignerStartDate
-        let days = cal.dateComponents([.day], from: firstTrayStart, to: cal.startOfDay(for: .now)).day ?? 0
+        let days = cal.dateComponents([.day], from: firstTrayStart, to: cal.startOfDay(for: date)).day ?? 0
         return max(0, days)
     }
 
@@ -166,9 +170,11 @@ final class AppSettings {
         }
     }
 
-    /// Advance to the next tray, resetting the cycle start to today.
-    func advanceToNextTray() {
-        currentTrayNumber = min(currentTrayNumber + 1, max(totalTrays, currentTrayNumber + 1))
-        alignerStartDate = .now
+    /// Advance past `tray` (the tray just finished, defaulting to the current
+    /// one), resetting the cycle start to `date`.
+    func advanceToNextTray(from tray: Int? = nil, startingAt date: Date = .now) {
+        let finished = tray ?? currentTrayNumber
+        currentTrayNumber = min(finished + 1, max(totalTrays, finished + 1))
+        alignerStartDate = date
     }
 }

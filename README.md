@@ -46,7 +46,7 @@ Aligner Tracker/            App target
 ├── ViewModels/             TimerViewModel, DiaryViewModel, SettingsViewModel
 ├── Views/                  Home, History, Diary, DiaryEntry, ChangeAligner, Settings, Onboarding
 ├── Services/               SharedStore, NotificationService, BackupService
-├── Support/                Theme, ProgressRing, SystemPickers
+├── Support/                Theme, ProgressRing, SystemPickers, AdaptiveLayout
 ├── Localizable.xcstrings   en + zh-Hans
 └── PrivacyInfo.xcprivacy
 AlignerTrackerWidget/       Widget extension (small / medium / lock-screen)
@@ -99,6 +99,12 @@ Everything needed for the App Store lives in [`AppStore/`](AppStore):
 - `PRIVACY_POLICY.md` and `APP_PRIVACY_ANSWERS.md`
 - `ExportOptions.plist` for `xcodebuild -exportArchive`
 - `screenshots/6.9-inch/` and `screenshots/6.5-inch/` — framed App Store images
+- `screenshots/duo/` — iPhone Duo images: `outer/` (1398 × 2034), `inner/`
+  (2007 × 2853) and `inner-landscape/` (2853 × 2007), built from `raw/` by
+  `make_duo_screenshots.swift`
+
+The app adapts to the iPhone Duo's two screens; `docs/iphone-duo.md` covers the
+layout rules and how to re-check them.
 
 ## License
 

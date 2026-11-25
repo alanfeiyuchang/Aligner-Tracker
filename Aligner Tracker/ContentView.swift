@@ -19,7 +19,11 @@ struct RootView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.scenePhase) private var scenePhase
 
+    #if DEBUG
+    @State private var selectedTab: AppTab = ScreenshotSeed.initialTab
+    #else
     @State private var selectedTab: AppTab = .home
+    #endif
 
     var body: some View {
         Group {

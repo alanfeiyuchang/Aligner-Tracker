@@ -23,6 +23,12 @@ struct Aligner_TrackerApp: App {
         }
     }()
 
+    #if DEBUG
+    init() {
+        ScreenshotSeed.apply(settings: settings, container: container)
+    }
+    #endif
+
     var body: some Scene {
         WindowGroup {
             RootView()

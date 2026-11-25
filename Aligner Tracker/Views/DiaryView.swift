@@ -15,6 +15,9 @@ struct DiaryView: View {
     @State private var diaryVM = DiaryViewModel()
     @State private var shareItem: ShareItem?
     @State private var showChangeFlow = false
+    #if DEBUG
+    @State private var showSeededEntry = ScreenshotSeed.mode == "entry"
+    #endif
 
     private let columns = [GridItem(.adaptive(minimum: 150), spacing: 12)]
 
@@ -60,6 +63,11 @@ struct DiaryView: View {
                 }
             }
             .sheet(isPresented: $showChangeFlow) { ChangeAlignerView() }
+            #if DEBUG
+            .navigationDestination(isPresented: $showSeededEntry) {
+                if let newest = entries.first { DiaryEntryView(entry: newest) }
+            }
+            #endif
             .sheet(item: $shareItem) { item in ShareSheet(items: [item.url]) }
         }
     }

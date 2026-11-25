@@ -96,6 +96,7 @@ struct SettingsView: View {
                     }
                 }
             }
+            .readableContentWidth()
             .navigationTitle("Settings")
             .task { await vm.refreshNotificationStatus() }
             // Reschedule notifications & refresh widget whenever relevant settings change.

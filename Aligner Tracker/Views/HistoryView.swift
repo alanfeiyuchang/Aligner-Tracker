@@ -18,6 +18,9 @@ struct HistoryView: View {
     @State private var visibleMonth: Date = Calendar.current.startOfDay(for: .now)
     @State private var selectedDay: Date? = Calendar.current.startOfDay(for: .now)
 
+    /// Width of the scroll area; picks one column or two (see `WideLayout`).
+    @State private var canvasWidth: CGFloat = 0
+
     private var goal: Double { settings.dailyGoalSeconds }
     private let cal = Calendar.current
 
@@ -32,15 +35,19 @@ struct HistoryView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 20) {
-                    statsRow
-                    calendarCard
+                let columns = WideLayout.columns(width: canvasWidth, spacing: 20)
+                columns {
+                    VStack(spacing: 20) {
+                        statsRow
+                        calendarCard
+                    }
                     if let day = selectedDay {
                         selectedDayCard(day)
                     }
                 }
                 .padding()
             }
+            .adaptiveContentWidth($canvasWidth)
             .background(Color(.systemGroupedBackground))
             .navigationTitle("History")
         }

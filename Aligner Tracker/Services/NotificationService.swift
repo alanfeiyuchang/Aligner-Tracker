@@ -41,6 +41,10 @@ final class NotificationService {
 
     /// Cancel and re-create all notifications according to current settings.
     func reschedule(with settings: AppSettings) async {
+        #if DEBUG
+        // Screenshot runs use throwaway data; they must not touch real reminders.
+        if ScreenshotSeed.mode != nil { return }
+        #endif
         center.removePendingNotificationRequests(withIdentifiers: [
             ID.dayBefore, ID.changeDay, ID.dailyReminder
         ])

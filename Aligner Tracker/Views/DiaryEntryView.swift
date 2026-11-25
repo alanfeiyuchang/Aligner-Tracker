@@ -18,10 +18,13 @@ struct DiaryEntryView: View {
     @State private var diaryVM = DiaryViewModel()
     @State private var shareItem: ShareItem?
     @State private var showDeleteConfirm = false
+    /// Width of the scroll area; picks one column or two (see `WideLayout`).
+    @State private var canvasWidth: CGFloat = 0
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+            let columns = WideLayout.columns(width: canvasWidth, spacing: 16)
+            columns {
                 if let data = entry.photoData, let ui = UIImage(data: data) {
                     Image(uiImage: ui)
                         .resizable()
@@ -35,31 +38,34 @@ struct DiaryEntryView: View {
                         .overlay(Image(systemName: "mouth").font(.system(size: 48)).foregroundStyle(Theme.tealDark))
                 }
 
-                VStack(alignment: .leading, spacing: 10) {
-                    metaRow("mouth", "Tray", "\(entry.trayNumber)")
-                    DatePicker(selection: dateBinding) {
-                        Label("Date & time", systemImage: "calendar")
-                            .foregroundStyle(Theme.tealDark)
+                VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        metaRow("mouth", "Tray", "\(entry.trayNumber)")
+                        DatePicker(selection: dateBinding) {
+                            Label("Date & time", systemImage: "calendar")
+                                .foregroundStyle(Theme.tealDark)
+                        }
+                        .datePickerStyle(.compact)
+                        metaRow("clock", "Treatment day", "\(entry.totalTreatmentDays)")
                     }
-                    .datePickerStyle(.compact)
-                    metaRow("clock", "Treatment day", "\(entry.totalTreatmentDays)")
-                }
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemGroupedBackground)))
-
-                if !entry.note.isEmpty {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Note").font(.headline)
-                        Text(entry.note).foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemGroupedBackground)))
+
+                    if !entry.note.isEmpty {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Note").font(.headline)
+                            Text(entry.note).foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemGroupedBackground)))
+                    }
                 }
             }
             .padding()
         }
+        .adaptiveContentWidth($canvasWidth)
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Tray \(entry.trayNumber)")
         .navigationBarTitleDisplayMode(.inline)

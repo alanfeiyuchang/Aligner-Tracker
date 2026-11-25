@@ -9,7 +9,11 @@ import SwiftUI
 
 struct OnboardingView: View {
     @Environment(AppSettings.self) private var settingsEnv
+    #if DEBUG
+    @State private var page = ScreenshotSeed.onboardingPage
+    #else
     @State private var page = 0
+    #endif
 
     var body: some View {
         @Bindable var settings = settingsEnv
@@ -33,6 +37,10 @@ struct OnboardingView: View {
             .tint(Theme.teal)
             .padding()
         }
+        // Wider than any phone: keep the pages and the button a readable
+        // width instead of stretching them across the unfolded screen.
+        .frame(maxWidth: WideLayout.readableWidth)
+        .frame(maxWidth: .infinity)
         .background(Color(.systemGroupedBackground))
     }
 

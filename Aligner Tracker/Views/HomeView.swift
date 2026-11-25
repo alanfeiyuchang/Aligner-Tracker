@@ -12,7 +12,13 @@ struct HomeView: View {
     @Environment(TimerViewModel.self) private var timer
     @Environment(AppSettings.self) private var settings
 
+    #if DEBUG
+    @State private var showChangeFlow = ScreenshotSeed.mode == "change"
+    #else
     @State private var showChangeFlow = false
+    #endif
+    /// Width of the scroll area; picks one column or two (see `WideLayout`).
+    @State private var canvasWidth: CGFloat = 0
 
     private var goalSeconds: Double { settings.dailyGoalSeconds }
     private var progress: Double { goalSeconds > 0 ? timer.todayTotalSeconds / goalSeconds : 0 }
@@ -20,13 +26,17 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 28) {
+                let columns = WideLayout.columns(width: canvasWidth, spacing: 28)
+                columns {
                     timerCard
-                    trayCard
-                    changeButton
+                    VStack(spacing: 28) {
+                        trayCard
+                        changeButton
+                    }
                 }
                 .padding()
             }
+            .adaptiveContentWidth($canvasWidth)
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Home")
             .sheet(isPresented: $showChangeFlow) {

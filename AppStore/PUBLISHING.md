@@ -8,7 +8,7 @@ What's already prepared in this repo:
 - ✅ `PrivacyInfo.xcprivacy` for the app and the widget (required-reason APIs declared)
 - ✅ `ITSAppUsesNonExemptEncryption = NO` in both Info.plist files (no encryption prompt)
 - ✅ English + Simplified Chinese localization (`Localizable.xcstrings`)
-- ✅ Versioning: `MARKETING_VERSION = 1.0`, `CURRENT_PROJECT_VERSION = 1`
+- ✅ Versioning: `MARKETING_VERSION = 1.1`, `CURRENT_PROJECT_VERSION = 1` (Xcode Cloud stamps its own build number)
 - ✅ Listing copy, privacy policy, privacy-questionnaire answers, `ExportOptions.plist` (this folder)
 
 What only **you** can do (needs your Apple account) is in **steps 1, 2, 6, 7, 8**.
@@ -106,6 +106,6 @@ xcodebuild -exportArchive \
 | App Group | `group.ACM.Aligner-Tracker` |
 | Team ID | `5V3HM8L9GT` |
 | Min iOS | 17.0 |
-| Version / Build | 1.0 / 1 |
+| Version / Build | 1.1 / set by Xcode Cloud |
 | Encryption | None (`ITSAppUsesNonExemptEncryption = NO`) |
 | Data collection | None (offline) |

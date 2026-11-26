@@ -91,7 +91,16 @@ https://example.com/aligner-tracker/support
 https://example.com/aligner-tracker
 ```
 
-### What's New in This Version (4000) — version 1.0
+### What's New in This Version (4000) — version 1.1
+```
+• iPhone Duo: the app now fits both screens. Unfolded, Home, History and diary entries use a two-column layout
+• Changing aligners: pick the date, tray number and treatment day yourself
+• History: the calendar now highlights the day you selected
+• Diary: the date of an existing entry can be edited
+• Fixed: the widget could report more than 24 hours of wear in a single day
+```
+
+### What's New — version 1.0 (previous release)
 ```
 Welcome to Aligner Tracker 1.0!
 
@@ -175,7 +184,16 @@ https://example.com/aligner-tracker/support
 https://example.com/aligner-tracker
 ```
 
-### What's New (4000) — 版本 1.0
+### What's New (4000) — 版本 1.1
+```
+• iPhone Duo：内外两块屏幕均已适配。展开后，主页、历史和日记详情改为两栏布局
+• 换牙套：日期、牙套编号和治疗天数都可以自己选
+• 历史：日历会标出当前选中的那一天
+• 日记：已有条目的日期可以修改
+• 修复：小组件单日佩戴时间可能显示超过 24 小时
+```
+
+### What's New — 版本 1.0（上一版）
 ```
 欢迎使用牙套追踪 1.0！
 
@@ -208,6 +226,11 @@ https://example.com/aligner-tracker
 Upload the framed 6.9" images in `AppStore/screenshots/6.9-inch/` (1320×2868) to
 **both** the English and Chinese localizations. A 6.5" set is also accepted; Apple
 can scale the 6.9" set down for other sizes.
+
+iPhone Duo (version 1.1): images are in `AppStore/screenshots/duo/` — `outer/`
+(1398×2034), `inner/` (2007×2853) and `inner-landscape/` (2853×2007), four each,
+English. They are the screens' native pixel sizes; check them against the sizes
+App Store Connect lists for the Duo slot before uploading. See `docs/iphone-duo.md`.
 
 ## F. App Privacy
 See `APP_PRIVACY_ANSWERS.md` → answer **"Data Not Collected."**

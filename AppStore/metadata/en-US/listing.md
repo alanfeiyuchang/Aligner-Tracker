@@ -56,6 +56,14 @@ https://example.com/aligner-tracker
 ## Privacy Policy URL
 https://example.com/aligner-tracker/privacy
 
-## What's New (version 1.0)
+## What's New (version 1.1)
+• iPhone Duo: the app now fits both screens. Unfolded, Home, History and diary
+  entries use a two-column layout
+• Changing aligners: pick the date, tray number and treatment day yourself
+• History: the calendar now highlights the day you selected
+• Diary: the date of an existing entry can be edited
+• Fixed: the widget could report more than 24 hours of wear in a single day
+
+## What's New (version 1.0, previous release)
 Initial release: wear-time timer, daily log & streaks, aligner change cycle with
 reminders, photo diary with PDF export, and Home/Lock Screen widgets.

@@ -55,11 +55,7 @@ https://example.com/aligner-tracker
 https://example.com/aligner-tracker/privacy
 
 ## 新功能 (What's New，版本 1.1)
-• iPhone Duo：内外两块屏幕均已适配。展开后，主页、历史和日记详情改为两栏布局
-• 换牙套：日期、牙套编号和治疗天数都可以自己选
-• 历史：日历会标出当前选中的那一天
-• 日记：已有条目的日期可以修改
-• 修复：小组件单日佩戴时间可能显示超过 24 小时
+已适配 iPhone Duo 的内外两块屏幕。
 
 ## 新功能 (What's New，版本 1.0，上一版)
 首个版本：佩戴计时、每日记录与连续达标、带提醒的换牙套周期、支持 PDF 导出的照片

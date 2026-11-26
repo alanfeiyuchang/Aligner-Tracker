@@ -93,11 +93,7 @@ https://example.com/aligner-tracker
 
 ### What's New in This Version (4000) — version 1.1
 ```
-• iPhone Duo: the app now fits both screens. Unfolded, Home, History and diary entries use a two-column layout
-• Changing aligners: pick the date, tray number and treatment day yourself
-• History: the calendar now highlights the day you selected
-• Diary: the date of an existing entry can be edited
-• Fixed: the widget could report more than 24 hours of wear in a single day
+Now fits iPhone Duo, on both the outer and the inner screen.
 ```
 
 ### What's New — version 1.0 (previous release)
@@ -186,11 +182,7 @@ https://example.com/aligner-tracker
 
 ### What's New (4000) — 版本 1.1
 ```
-• iPhone Duo：内外两块屏幕均已适配。展开后，主页、历史和日记详情改为两栏布局
-• 换牙套：日期、牙套编号和治疗天数都可以自己选
-• 历史：日历会标出当前选中的那一天
-• 日记：已有条目的日期可以修改
-• 修复：小组件单日佩戴时间可能显示超过 24 小时
+已适配 iPhone Duo 的内外两块屏幕。
 ```
 
 ### What's New — 版本 1.0（上一版）

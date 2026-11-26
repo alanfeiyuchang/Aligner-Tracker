@@ -54,7 +54,7 @@ https://example.com/aligner-tracker
 ## 隐私政策网址 (Privacy Policy URL)
 https://example.com/aligner-tracker/privacy
 
-## 新功能 (What's New，版本 1.1)
+## 新功能 (What's New，版本 1.2)
 已适配 iPhone Duo 的内外两块屏幕。
 
 ## 新功能 (What's New，版本 1.0，上一版)

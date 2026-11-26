@@ -56,9 +56,9 @@ https://example.com/aligner-tracker
 ## Privacy Policy URL
 https://example.com/aligner-tracker/privacy
 
-## What's New (version 1.1)
+## What's New (version 1.2)
 Now fits iPhone Duo, on both the outer and the inner screen.
 
-## What's New (version 1.0, previous release)
+## What's New (version 1.0)
 Initial release: wear-time timer, daily log & streaks, aligner change cycle with
 reminders, photo diary with PDF export, and Home/Lock Screen widgets.

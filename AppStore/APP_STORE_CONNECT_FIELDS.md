@@ -91,7 +91,7 @@ https://example.com/aligner-tracker/support
 https://example.com/aligner-tracker
 ```
 
-### What's New in This Version (4000) — version 1.1
+### What's New in This Version (4000) — version 1.2
 ```
 Now fits iPhone Duo, on both the outer and the inner screen.
 ```
@@ -180,7 +180,7 @@ https://example.com/aligner-tracker/support
 https://example.com/aligner-tracker
 ```
 
-### What's New (4000) — 版本 1.1
+### What's New (4000) — 版本 1.2
 ```
 已适配 iPhone Duo 的内外两块屏幕。
 ```
@@ -219,7 +219,7 @@ Upload the framed 6.9" images in `AppStore/screenshots/6.9-inch/` (1320×2868) t
 **both** the English and Chinese localizations. A 6.5" set is also accepted; Apple
 can scale the 6.9" set down for other sizes.
 
-iPhone Duo (version 1.1): images are in `AppStore/screenshots/duo/` — `outer/`
+iPhone Duo (version 1.2): images are in `AppStore/screenshots/duo/` — `outer/`
 (1398×2034), `inner/` (2007×2853) and `inner-landscape/` (2853×2007), four each,
 English. They are the screens' native pixel sizes; check them against the sizes
 App Store Connect lists for the Duo slot before uploading. See `docs/iphone-duo.md`.
